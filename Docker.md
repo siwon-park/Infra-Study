@@ -1,4 +1,4 @@
-![Docker image](images/Docker/Docker image.png)
+![Docker image](https://user-images.githubusercontent.com/93081720/174341063-d8894c50-7452-49b0-ae2f-7a4b019dc8a9.png)
 
 # Docker
 
