@@ -6,14 +6,16 @@ FROM node
 # COPY에 대해서도 기본적으로 해당 폴더에서 이뤄지므로 COPY . .으로 쓸 수 있는 것임
 WORKDIR /app
 
+# package.json을 컨테이너 내부 /app에 복사함(최적화 목적)
+COPY package.json /app
+
+RUN npm install
+
 # COPY; 도커에게 어떤 파일이 들어가야하는지 설정함
 # 첫번째 .은 현재 디렉토리, 두번째 .은 해당 파일을 저장해야하는 이미지 내부의 경로
 # 모든 이미지와 컨테이너에는 자체 내부 파일 시스템이 존재함
 # COPY . /app # 모든 파일이 app폴더에 복사됨(폴더가 없을 경우 생성)
-COPY . .
-
-RUN npm install
-
+COPY . /app
 # EXPOSE로 우리의 로컬 시스템에 특정 포트를 연다고 도커에게 알려줌
 # 그러나 문서화하는 것 뿐이지 실질적으로 기능을 하지 않음
 # docker run -p 3000:80 <컨테이너 명>과 같이 작성하여 작동하게 함
