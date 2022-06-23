@@ -174,7 +174,57 @@ build 명령어를 통해 이미지를 만들고, run 명령어를 통해 이미
 
 ### 이미지-컨테이너 관리
 
+#### 실행 중지된 컨테이너 '재시작'하기
 
+`docker start <컨테이너명>`
 
+재시작이 필요한 이유?
 
+- docker run 명령어는 항상 새로운 컨테이너를 생성함
+- 따라서 이미 생성된 컨테이너를 다시 불러와야하는 경우 docker run을 통해서 작업을 진행하는 것은 다소 부적절할 수도 있음 => 매번 굳이 컨테이너를 생성하는 것도 자원 낭비임
+
+<br>
+
+단, docker start를 해서 컨테이너를 재시작해도 docker run을 통해 컨테이너 생성 후 실행하는 것과는 터미널에 나오는 내용이 다름(docker run은 마치 서버를 실행한 듯하지만, docker start는 터미널 그대로임)
+
+그러나, docker ps를 입력하면 실행 중인 컨테이너 목록에는 실행 중으로 표현됨. 실행 중인 것이 터미널 상에 표현이 되지 않을 뿐, 백그라운드에서는 실행 중임. 이는 attached 모드와 detached 모드와 관련이 있음
+
+<br>
+
+#### attached 모드와 detached 모드
+
+attached(붙어 있음)와 detached(분리되어 있음)의 의미는 컨테이너가 터미널과 연결되어 있냐, 분리되어 있냐의 차이임
+
+- attached : 실행 중인 컨테이너와 연결되어 터미널에 결과 등을 출력 가능
+- detached : 실행 중인 컨테이너와 연결되어 있지 않아서 터미널 상에 입력 결과 등을 볼 수 없음
+
+=> **docker start는 detached 모드가 default**
+
+- `docker start -a <컨테이너 명>` : -a 옵션으로 attached 모드로 실행 가능
+
+=> **docker run는 attached 모드가 default**
+
+- `docker run -d <컨테이너 명>` : -d 옵션으로 detached 모드로 실행 가능
+
+<br>
+
+#### Interactive 모드
+
+컨테이너의 이미지가 터미널 기반의 실행환경일 경우, 컨테이너를 재시작해도 처음 실행했을 때처럼 반응형이 아님. `-i`옵션을 섞어서 interactive 모드로 실행시켜야 우리가 원하는 대로 반응하게 할 수 있음
+
+- `docker run -i -t <컨테이너 명>` 또는 `docker run -it <컨테이너 명>`
+  - `-i` : interactive 모드로 실행함
+  - `-t` : allocate pseudo TTY; 터미널로 실행함
+- `docker start -a -i <컨테이너 명>` : 컨테이너를 attached 모드, interactive 모드로 재시작함
+
+단, 터미널 기반의 실행환경을 가진 컨테이너의 경우 터미널 실행이 완료되고 나서 터미널이 종료가 되면 컨테이너도 같이 종료가 됨
+
+<br>
+
+#### 로그 확인(Logs)
+
+- `docker logs <컨테이너 명>` : 해당 컨테이너의 로그를 볼 수 있음
+- `docker logs -f <컨테이너 명>` : logs 기능 + 컨테이너 연결
+
+<br>
 
