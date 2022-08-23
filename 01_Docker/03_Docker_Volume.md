@@ -53,7 +53,7 @@ docker run -p 3000:80 -d --name feedback-app --rm feedback-node:latest
 ### 기본 명령어
 
 - `docker volume --help` : volume에 대한 명렁어를 알아볼 수 있음
-- `docker volume ls` : 볼륨 리스트를 출력함
+- `docker volume ls` : (활성화된) 볼륨 리스트를 출력함
 
 
 
@@ -157,8 +157,35 @@ Docker file로 빌드하는 소스코드를 스냅샷으로 복사하지 않고 
 
 
 
-### 구분법
+### 각 볼륨 구분법
 
 - 콜론(:) 앞에 로컬 머신의 경로가 붙어있다 => 바인드 마운트
 - 콜론(:) 앞에 경로가 아닌 명칭이 붙어있다(이름으로 취급됨) => 기명 볼륨
 -  아무것도 없이 -v 다음에 바로 경로가 나온다 => 익명 볼륨
+
+<br>
+
+### 읽기 전용 볼륨(Read-Only Volume)
+
+불륨의 default는 Read-Write이나 Read-Only모드로 생성할 수 있음
+
+=> 바인드 마운트의 경로 끝에 `:ro`를 추가하면 됨
+
+```
+docker run -d 3000:80 --name feedback-app -v feedback:/app/feedback -v "Users/siwon-park/myfolder:/app:ro" -v /app/node_modules feedback-node:volumes
+```
+
+<br>
+
+### 볼륨 관리하기
+
+- `docker volume ls` : 활성화된 볼륨 조회
+  - 바인드 마운트는 도커에 의해 관리되지 않기 때문에 ls 명령어로 조회되지 않음
+- `docker volume create <볼륨명>` : 볼륨을 (수동으로) 생성함
+  - 터미널에서 컨테이너 생성 시 -v로 볼륨을 생성한다면, 해당 컨테이너의 볼륨을 도커가 자동으로 생성해줌
+  - 컨테이너 생성 후 볼륨이 필요할 경우 create 명령어를 사용하여 볼륨을 생성함
+- `docker volume inspect <볼륨명>` : 볼륨에 대해서 검사하여, 볼륨에 대한 정보를 파악 가능함
+  - 생성일, mountpoint 등에 대해 파악할 수 있음
+    - mountPoint: 실제 데이터가 저장되는 호스트 머신상의 경로. 실제 경로는 아니며, 우리의 시스템에 도커가 설정한 가성 머신 내부에 존재하는 경로 => 사실상 찾기가 매우 어려움  
+
+- `docker volume rm <볼륨명>` : 볼륨을 삭제함. 단, 실행 중인 컨테이너의 볼륨은 삭제가 불가능함. 컨테이너 중지 이후에 실행해야함
