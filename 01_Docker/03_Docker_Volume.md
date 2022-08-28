@@ -189,3 +189,92 @@ docker run -d 3000:80 --name feedback-app -v feedback:/app/feedback -v "Users/si
     - mountPoint: 실제 데이터가 저장되는 호스트 머신상의 경로. 실제 경로는 아니며, 우리의 시스템에 도커가 설정한 가성 머신 내부에 존재하는 경로 => 사실상 찾기가 매우 어려움  
 
 - `docker volume rm <볼륨명>` : 볼륨을 삭제함. 단, 실행 중인 컨테이너의 볼륨은 삭제가 불가능함. 컨테이너 중지 이후에 실행해야함
+
+<br>
+
+### COPY 명령어 vs. 바인드 마운트
+
+개발 중에는 바인드 마운트를 사용해서 소스 코드의 변경 사항을 즉각적으로 반영할 수 있다. 그러나 실제 프로덕션 단계에서는 바인드 마운트를 사용하지 않는다. 왜냐하면 실제 개발이 끝나서 서버에서 컨테이너를 실행 시 바인드 마운트로 실행하지 않기 때문이다.
+
+물론 볼륨을 사용할 수는 있지만, 바인드 마운트는 호스트 머신의 실제 주소이므로, 연결된 소스코드가 없어 사용하지 않는다.
+
+실제 배포 단계에서는 코드의 스냅샷이 필요하기 때문에 COPY를 쓴다.
+
+<br>
+
+### .dockerignore
+
+> COPY 명령어로 복사해서는 안 되는 폴더와 파일을 지정 가능함
+>
+> 어플리케이션이 실행되는데 필요없는 모든 것을 추가 가능함
+
+- 예를 들어, .dockerignore 파일을 만들고 그 안에 node_modules라고 썼다면
+
+```dockerfile
+RUN npm install # 빌드 시, 이미지 내부에 node_modules 생성
+COPY . . # 로컬에 있는 node_modules를 복사하여 위에서 npm install로 생성한 node_modules를 뒤엎음
+```
+
+- 그런데, 만약에 로컬에 있는 node_modules가 구버전이라면? 또는 굳이 이미지 내부에 복사한 node_modules와 완전히 동일한데 로컬에 있는 것을 복사하는 과정을 쓸 데 없이 할 필요가 있을까?
+- `.dockerignore`를 사용하면 이미지 내부의 node_modules를 사용하기 때문에 이런 불필요한 행동을 사전에 방지할 수 있음
+
+<br>
+
+### 환경변수(.env)
+
+> 환경 변수를 사용하여 docker run 명령어를 바꾸거나 Dockerfile을 하드 코딩하는 방식으로 값을 변경하지 않고 유연하게 원하는 변수 값을 변경 가능함
+
+- Dockerfile
+
+![image](https://user-images.githubusercontent.com/93081720/187053054-02f73998-8850-4722-a937-b3ffd14d5867.png)
+
+- PORT값을 사용하는 소스코드(server.js)
+
+![image](https://user-images.githubusercontent.com/93081720/187053060-fa303f4c-f471-44af-bbd2-6fb8768c4471.png)
+
+#### 방법1) docker run 명령어에서 설정
+
+`--env key=value` 형태로 지정함
+
+- 예) PORT를 8000으로 변경하고 싶을 때 `--env PORT=8000` 또는 `-e PORT=8000`
+
+```
+docker run -d --rm -p 3000:80 --env PORT=8000 --name feedback-app -v feedback:/app/feedback -v "/Users/siwon-park/my-folder:/app:ro" -v /app/node_modules -v /app/temp feedback-node:env
+```
+
+#### 방법2) .env 파일 생성
+
+![image](https://user-images.githubusercontent.com/93081720/187053184-bcaa2d58-95e3-4092-9ee8-193eb1de970f.png)
+
+`--env-file ./.env`를 통해서 .env 파일에서 정의한 환경 변수를 불러 올 수 있음
+
+- 예)
+
+```
+docker run -d --rm -p 3000:80 --env-file ./.env --name feedback-app -v feedback:/app/feedback -v "/Users/siwon-park/my-folder:/app:ro" -v /app/node_modules -v /app/temp feedback-node:env
+```
+
+<br>
+
+### 빌드변수(ARG)
+
+> 변경사항이 있을 때, Dockerfile의 값을 변경하지 않고 보다 유연성있게 이미지를 빌드 가능함
+
+다음과 같이 Dockerfile에 설정하여 사용 가능함
+
+![image](https://user-images.githubusercontent.com/93081720/187053253-3986a25b-e9c7-46db-822b-642f3ba30dac.png)
+
+단, 해당 명령어는 RUN npm install과 같이 실행 프로세스가 오래 걸리는 명령어 보다 나중에 쓰는 것이 바람직하다.
+
+=> Why? ARG 명령어의 값이 변경 시, 후속 레이어 또한 다시 빌드/재실행됨
+
+=> 포트 값만 변경된 것인데 굳이 npm install을 다시 할 필요는 없음
+
+- 빌드 시 사용 예시
+
+```
+docker build -t feedback-node:dev --build-arg DEFAULT_PORT=8000
+```
+
+Dockerfile에 DEFAULT_PORT가 80으로 지정되어 있어도 8000으로 바꿔 빌드함
+
