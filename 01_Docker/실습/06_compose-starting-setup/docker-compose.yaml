@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  mongodb:
+    image: 'mongodb'
+    volumes:
+      - data:/data/db
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=siwon
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    networks:
+      - goals-net
+
+  backend:
+    build: ./backend
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    ports:
+      - "80:80"
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend/src:/app/src
+    args:
+      - somearg=value
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+      
+    # 인터랙티브 모드로 동작하게 함
+    stdin_open: true
+    tty: true
+
+# 기명 볼륨
+volumes:
+    data:
+    logs:
+

@@ -1,0 +1,47 @@
+version: "3.8" # 도커 컴포즈의 사양 버전(우리가 만든 앱의 버전이 아님, 공식문서에 기록된 버전을 지칭)
+services:
+  mongodb:
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    # 컨테이너 이름 지정
+    container_name: mongodb
+    env_file:
+      - ./env/mongo.env
+    # networks:
+    #   - goals-net
+  backend:
+    # build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # args:
+      #   - somearg=value
+    ports:
+      - "80:80"
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./env/backend.env
+    depends_on:
+      - mongodb
+      
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+    # 인터랙티브 모드로 동작하게 함
+    stdin_open: true
+    tty: true
+
+
+  # 익명 볼륨
+  volumes:
+    data:
+    logs:
