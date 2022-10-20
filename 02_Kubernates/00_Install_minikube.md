@@ -113,7 +113,7 @@ minikube version
 minikube start --driver=hyperv
 ```
 
-![image-20221021003109956](C:\Users\SIWON\AppData\Roaming\Typora\typora-user-images\image-20221021003109956.png)
+![image](https://user-images.githubusercontent.com/93081720/197008319-e818395e-ec2a-4a58-9165-47adac6fa74c.png)
 
 ※ 만약 에러가 발생한다면? docker 또는 virtualbox 설치 후 다음과 같이 입력하여 진행
 
