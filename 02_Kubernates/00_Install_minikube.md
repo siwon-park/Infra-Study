@@ -107,6 +107,8 @@ minikube version
 
 ### 3. 실행하기
 
+실습을 할 때만 minikube를 키고 끝나면 종료할 것 => CPU, 메모리 때문
+
 - CMD 실행하기(꼭 관리자 권한으로 실행하지 않아도 되지만, 혹시 에러가 난다면 관리자 권한 실행)
 
 ```
@@ -149,16 +151,28 @@ minikube dashboard
 ### 5. 주요 명령어
 
 ```
+# 실행
+minikube start
+
+# 특정 k8s 버전 실행
+minikube start --kubernetes-version=v1.23.1
+
+# 특정 driver 실행
+minikube start --driver=virtualbox --kubernetes-version=v1.23.1
+
+# 상태확인
+minikube status
+
+# minikube ip 확인 (접속테스트시 필요)
+minikube ip
+
+# ssh 접속
+minikube ssh
+
 # 정지
 minikube stop
 
 # 삭제
 minikube delete
-
-# ssh 접속
-minikube ssh
-
-# ip 확인
-minikube ip
 ```
 
