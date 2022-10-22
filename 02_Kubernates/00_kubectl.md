@@ -95,6 +95,13 @@ kubectl delete pod/wordpress-c9569c4d8-ngk2b
 
 > Pod는 제거해도 다시 계속해서 살아난다 => 정상!! ReplicaSet이 Pod의 개수를 유지시켜줌
 
+- 리소스 강제 제거 `-f`
+
+```bash
+kubectl delete -f https://subicura.com/k8s/code/guide/index/wordpress-k8s.yml
+kubectl delete -f wordpress-k8s.yml
+```
+
 ### 5. 컨테이너 로그 조회 (logs)
 
 ```
@@ -159,3 +166,4 @@ kubectl explain pod
 - 예시 - pod에 대한 설명
 
 ![image](https://user-images.githubusercontent.com/93081720/197320197-16217fce-a7b5-4ce8-babe-e3495fa618b7.png)
+
