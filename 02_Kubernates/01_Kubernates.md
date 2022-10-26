@@ -2,11 +2,17 @@
 
 # 01_Kubernates란 무엇인가?
 
+> 컨테이너 오케스트레이션 도구
+>
 > open-source system for automating deployment, scaling, and management of containerized applications
 
 대규모 배포, 컨테이너 스케일링, 모니터링에 도움이 되는 도구들의 집합, 시스템
 
 다중 머신을 위한 도커 컴포즈(Docker-Compose for Multiple Machines)
+
+=> 여러 개의 서버를 관리하는데 그 목적이 있음
+
+※ kubernates를 k8s라고 표기하기도 한다. k와 s 사이에 8개의 문자가 있다고 해서 그렇게 부르는 것이다.
 
 
 
@@ -38,42 +44,75 @@
 
 ## 쿠버네티스 아키텍쳐
 
-### 클러스터
+쿠버네티스는 항상 바람직한 상태(desired state)를 유지하려한다 => 현재의 상태와 바람직한 상태를 비교하여 바람직한 상태로 유지한다.
 
-컨테이너화된 어플리케이션을 구동 중인 워커 노드와 이들을 관리하기 위한 마스터 노드들의 집합
+### 클러스터(Cluster)
 
-![image](https://user-images.githubusercontent.com/93081720/192080299-5e2bae25-f6df-4f9f-9416-ae671cdd4e40.png)
+> 마스터 노드와 워커 노드로 구성된 집합
 
-### 노드
+컨테이너화된 어플리케이션을 구동 중인 '워커 노드'들과 이들을 관리하기 위한 '마스터 노드'의 집합
+
+![image](https://user-images.githubusercontent.com/93081720/198068743-e2c790c2-f55e-43a6-8094-456546b21835.png)
+
+### 노드(Node)
 
 한 개 이상의 포드를 호스팅하고 있는 물리적 또는 가상 머신으로 클러스터와 의사소통 함
 
-#### 마스터 노드
+#### 마스터 노드(Master Node)
 
 워커 노드를 관리하는 노드
 
-#### 워커 노드
+컨트롤 플레인을 통해서 워커노드들을 관리
+
+##### 컨트롤 플레인(control plane)
+
+- kube-api server : 외부와 통신하는 프로세스. kubectl로부터 명령을 전달받아서 실행함
+- kube-controller-manager : 컨트롤러를 통합/관리/실행함
+- kube-scheduler : 파드(Pod)를 워커 노드에 할당하는 역할을 수행
+- cloud-controller-manager : 클라우드 서비스와 연동해 서비스(Service)를 생성함
+- etcd : 클러스터 관련 정보 전반을 관리하는 DB
+
+##### etcd
+
+키(key)와 값(value) 쌍의 DB
+
+쿠버네티스는 etcd에 등록된 내용에 따라 실제 파드나 서비스를 생성한다. 이렇게 생성된 오브젝트들을 인스턴스라고 부른다.
+
+.yaml(yml) 파일(매니페스트 파일)의 내용이 DB에 저장되고, 쿠버네티스가 해당 파일의 내용을 읽는다.
+
+따라서 직접 커맨드로 컨테이너에 어떤 작업을 하도록 명령하게 되면 etcd에 있는 내용과 불일치가 발생한다.
+
+
+
+#### 워커 노드(Worker Node)
 
 포드를 호스팅하며, 자원을 가지고 앱 컨테이너 실행 중인 노드
 
-Kublet, Docker, Kube-proxy와 여러 개의 Pod로 구성되어 있음
+kubelet, Docker, Kube-proxy와 여러 개의 파드(Pod)로 구성되어 있음
 
-![image](https://user-images.githubusercontent.com/93081720/192080519-4e13f4dd-7ace-4faf-a50c-a195483a4e7c.png)
+- kubelet : 마스터 노드에 있는 kube-scheduler와 연동하여 워커 노드에 파드를 배치하고 실행하는 것과 실행 중인 파드의 상태를 정기적으로 모니터링하여 kube-scheduler에 알려주는 역할을 담당
+- kube-porxy : 워커 노드의 네트워크 통신의 라우팅 역할을 담당
 
-### 포드
+![image](https://user-images.githubusercontent.com/93081720/198069521-9586fb2d-0892-4ac6-affb-1e2b8572fb15.png)
+
+### 파드(Pod)
 
 실제로 컨테이너화된 어플리케이션을 실행 중인 작업 실행 단위로, 컨테이너 구동을 위한 자원(예- 볼륨)을 요구함
 
+보통 하나의 파드에는 1개의 컨테이너와 1개의 볼륨(1 Pod per 1 Container 1 Volume)으로 구성된다. (멀티 컨테이너로 구성될 수도 있다.)
 
-
-### 컨테이너
+#### 컨테이너(Container)
 
 일반적으로 알려진 도커 컨테이너
 
 
 
-### 서비스
+### 서비스(Service)
 
 독립적인 IP 주소를 갖는 논리적인 포드의 그룹
 
-Load Balancer의 역할을 함
+Load Balancer의 역할을 함 => 그러나 이는 실제 흔히 말하는 로드 밸런서의 개념과는 다름
+
+서비스가 분배하는 통신은 해당 워커 노드에만 국한된다.
+
+(워커 노드 간 분배는 인그레스(Ingress)와 실제 로드 밸런서가 담당한다 => 별도의 노드에서 동작하거나 물리적 하드웨어를 통해 구성한다.)
