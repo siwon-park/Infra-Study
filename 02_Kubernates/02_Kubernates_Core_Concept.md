@@ -20,15 +20,15 @@ deploy 생성/변경과 같은 명령을 클러스터에 보내는 역할
 
 ※ 굳이 비유하자면, kubectl은 총군수권자, cluster는 군대, master node는 장군, worker node는 군인
 
-![image](https://user-images.githubusercontent.com/93081720/197245934-d9beb7d2-74a9-4974-be39-e0ea070ece9a.png)
+![image](https://user-images.githubusercontent.com/93081720/198072726-7ad1e054-5264-4998-b107-7a495ae670a0.png)
 
 <br>
 
 ## 03_Kubernates 오브젝트
 
-![image](https://user-images.githubusercontent.com/93081720/197244755-76893ed7-a3b9-4cf5-ad08-0f7d4e4223af.png)
+![image-20221027004859283](C:\Users\SIWON\AppData\Roaming\Typora\typora-user-images\image-20221027004859283.png)
 
-### Pods(파드)
+### 파드(Pod)
 
 > 쿠버네티스가 상호작용하는 가장 작은 단위
 
@@ -45,5 +45,22 @@ deploy 생성/변경과 같은 명령을 클러스터에 보내는 역할
   - pod가 쿠버네티스에 의해 교체/제거되면 pod의 리소스는 손실됨 => 도커 컨테이너와 유사
 - 사용자가 직접 pod를 강제로 생성/수정/삭제할 수 있지만 쿠버네티스가 자동적으로 해야하는 일임
 
+<br>
+
+### 레플리카 셋(Replica Set)
+
+> 파드 수를 관리/모니터링함
+
+일반적으로 레플리카 셋 단독으로 사용되는 경우는 거의 없다. 디플로이먼트와 함께 사용
 
 
+
+### 디플로이먼트(Deployment)
+
+> 파드의 배포를 관리, 일반적으로 레플리카 셋과 함께 사용
+
+
+
+### 서비스(Service)
+
+![image](https://user-images.githubusercontent.com/93081720/198083922-5dc140f3-2c87-4798-a478-4d65e1fe6fe7.png)
