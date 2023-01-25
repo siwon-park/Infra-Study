@@ -1,4 +1,4 @@
-# Minikube
+# 03_Minikube
 
 k8s 학습을 도와주는 간단한 도구
 

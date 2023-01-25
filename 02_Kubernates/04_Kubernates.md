@@ -1,6 +1,6 @@
 ![kubernets](https://user-images.githubusercontent.com/93081720/174333422-4e2f7a03-f585-4edf-884c-0af7fea7ac5d.png)
 
-# 01_Kubernates란 무엇인가?
+# 04_Kubernates란 무엇인가?
 
 > 컨테이너 오케스트레이션 도구
 >
@@ -42,7 +42,7 @@
 
 <br>
 
-## 2. 쿠버네티스 아키텍쳐
+## 1. 쿠버네티스 아키텍쳐
 
 쿠버네티스는 항상 바람직한 상태(desired state)를 유지하려한다 => 현재의 상태와 바람직한 상태를 비교하여 바람직한 상태로 유지한다.
 

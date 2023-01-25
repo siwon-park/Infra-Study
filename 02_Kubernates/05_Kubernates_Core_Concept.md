@@ -1,8 +1,8 @@
 ![kubernets](https://user-images.githubusercontent.com/93081720/174333422-4e2f7a03-f585-4edf-884c-0af7fea7ac5d.png)
 
-# 02_Kubernates 핵심 개념
+# 05_Kubernates 핵심 개념
 
-## 01_Kubernates가 하는 일과 우리가 하는 일
+## 1. Kubernates가 하는 일과 우리가 하는 일
 
 ### Kubernates가 하는 일
 
@@ -24,7 +24,7 @@ deploy 생성/변경과 같은 명령을 클러스터에 보내는 역할
 
 <br>
 
-## 03_Kubernates 오브젝트
+## 2. Kubernates 오브젝트
 
 ![image-20221027004859283](C:\Users\SIWON\AppData\Roaming\Typora\typora-user-images\image-20221027004859283.png)
 
