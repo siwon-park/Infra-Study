@@ -1,4 +1,4 @@
-# 01_Jenkins CI/CD 환경 구성
+# 01_Jenkins CI/CD 환경 구성 - DinD
 
 ### 사용 기술 스택
 
