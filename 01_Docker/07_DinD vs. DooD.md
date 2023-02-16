@@ -28,6 +28,8 @@ docker run --privileged --name DinD_test -d docker:1.8-dind
 
 이 옵션은 호스트 컨테이너가 호스트 머신 전체에 대한 엑세스를 허용하기 때문에 호스트 컨테이너가 호스트 머신에서 할 수 있는 거의 모든 작업을 할 수 있게 된다. 따라서 DinD 방식은 보안상 치명적인 결함이 존재하는 것이다.
 
+※ 기본적으로 모든 컨테이너는 unprivileged 상태로 호스트 시스템의 자원에 접근하거나 사용하는 것이 불가능하다.
+
 <br>
 
 ## 2. Docker-out-of-Docker
