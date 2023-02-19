@@ -32,6 +32,14 @@ docker run --privileged --name DinD_test -d docker:1.8-dind
 
 <br>
 
+### Jenkins Docker In Docker
+
+젠킨스 컨테이너를 Docker In Docker 방식으로 실행시키고 컨테이너를 생성하는 과정
+
+젠킨스 컨테이너 내부에 도커를 설치하고, 내부의 도커 데몬을 이용해서 호스트 머신에 컨테이너를 생성하고 실행시킴![image](https://user-images.githubusercontent.com/93081720/219939079-e9e0fccf-e04c-4768-aff1-32130edb4792.png)
+
+<br>
+
 ## 2. Docker-out-of-Docker
 
 > 호스트 머신에 설치되어 있는 도커를 이용해서 도커 컨테이너를 추가 생성(실행)하는 방법
@@ -59,6 +67,16 @@ docker run -it -v /tmp:/tmp -v /etc/crontab:/etc/crontab --rm busybox sh
 또한 docker.sock을 공유하기 위해 그만큼의 권한을 도커 컨테이너에 제공했으니, 그만큼의 취약점은 생길 수 밖에 없다.
 
 정리하자면 DooD 방식은 DinD 방식보다 조금 더 보안상 안전하다는 것이지 완벽하게 안전한 방법은 아니다.
+
+<br>
+
+### Jenkins Docker Out of Docker
+
+젠킨스 컨테이너를 실행시키고 Docker Out of Docker 방식으로 컨테이너를 생성하는 과정
+
+젠킨스 컨테이너를 호스트 머신의 도커 클라이언트와 도커 소켓을 볼륨 마운트 시켜서 실행시키고, 호스트 머신의 도커 데몬을 이용해서 컨테이너를 생성하고 실행함
+
+![image](https://user-images.githubusercontent.com/93081720/219939587-38c40716-f787-494e-93e6-98eec36398c7.png)
 
 <br>
 
