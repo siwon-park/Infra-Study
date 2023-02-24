@@ -58,7 +58,13 @@ Pod와 컨테이너 모니터링, 관리, 스케일링 등
 
 ### Kubectl
 
-> deploy 생성/변경과 같은 명령을 클러스터에 보내는 역할
+> 쿠버네티스 API를 사용하여 쿠버네티스 클러스터의 컨트롤 플레인과 통신하기 위한 커맨드라인 툴
+
+deploy 생성/변경과 같은 명령을 클러스터에 보내는 역할
+
+```bash
+kubectl [command] [TYPE] [NAME] [flags]
+```
 
 ※ 굳이 비유하자면, kubectl은 총군수권자, cluster는 군대, master node는 장군, worker node는 군인
 
