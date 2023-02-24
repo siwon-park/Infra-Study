@@ -1,4 +1,4 @@
-# 01_kubectl
+# 04_kubectl
 
 ## 1. kubectl 명령어
 
