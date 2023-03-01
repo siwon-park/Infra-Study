@@ -20,3 +20,22 @@
 
 > 구성 및 관리의 편의성
 
+### 만약 EKS를 사용하지 않는다면?
+
+> 직접 쿠버네티스 클러스터를 구축해야함
+
+다음과 같은 과정을 직접 해야 한다.
+
+#### Pod 생성
+
+nginx 이미지로 컨테이너를 실행하는 파드를 생성
+
+```bash
+kubectl run nginx --image=nginx
+```
+
+#### ※ Pod 생성 순서
+
+1. Deployment 생성
+2. Deployment로 ReplicaSet을 생성
+3. ReplicaSet에 의해 Pod 생성
