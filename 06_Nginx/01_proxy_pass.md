@@ -6,11 +6,50 @@ Nginx가 제공하는 Reverse Proxy 기능으로 클라이언트의 요청에 �
 
 <br>
 
-## 1. Forward Proxy와 Reverse Proxy
+## 1. Proxy Server
 
-Forward Proxy
+> Proxy 서버란 클라이언트를 다른 네트워크 서비스에 연결시켜주는 중계 프로그램이다.
 
-Reverse Proxy
+즉, Proxy 서버는 서버로 들어오는 요청(request)를 중계하는 역할을 한다. 일반적으로 서버를 기반으로 작동하기 때문에 Proxy 서버라고 불리는 것임.
+
+![image](https://user-images.githubusercontent.com/93081720/227755837-b38c79b0-3af6-4892-9e5e-3b595fcba09d.png)
+
+### Proxy Server 도입 목적
+
+- 보안
+  - 익명의 사용자가 직접적으로 웹 서버로 접근하지 못하고 Proxy Server를 거쳐 접속하도록 보안적으로 더 안정적
+- 속도
+  - 사용자의 요청을 캐싱하여 가지고 있다가, 동일한 요청이 오면 캐시에서 사용하여 불필요한 리소스 낭비와 속도면에서 이점
+- ACL
+  - 사용자의 서버에 대한 접근읋 허용할 것인지 말 것인지에 대한 정책적인 정의 가능
+- 로그
+  - 네트워크로 접근하는 사용자에 대한 사용 정보를 로깅 가능
+- 우회
+  - 보안, 트래픽 등의 이유로 네트워크에 제한이 있을 때 다른 서비스로 우회하도록 가능
+
+<br>
+
+### Proxy Server의 종류
+
+#### Forward Proxy
+
+앞단에서 proxy server가 중계하는 형태
+
+클라이언트가 특정 서비스에 대한 요청을 하면 요청한 타겟 서비스의 서버로 전달해줌
+
+즉, `a-1`이라는 요청을 하면 `a-1`로 전달해줌
+
+![image](https://user-images.githubusercontent.com/93081720/227756540-a3f2283d-1ec9-4876-9af0-89a764e4d021.png)
+
+#### Reverse Proxy
+
+뒷단에서 proxy server가 중계하는 형태
+
+클라이언트가 특정 서비스에 대한 요청을 하면 요청한 타겟 서비스의 서버로 전달해주긴 하나, 같은 타겟 서버 내 다른 서비스를 처리하는 곳으로 보내질 수도 있음
+
+즉, `a-1`이라는 요청을 하더라도, `a-1`이라는 요청을 내부적으로 처리하여 `a-1`, `a-2`, `a-3` 등으로 보내질 수 있음
+
+![image](https://user-images.githubusercontent.com/93081720/227756550-cd35dd20-ae53-4707-b820-eb9e0e86e42a.png)
 
 <br>
 
