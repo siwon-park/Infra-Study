@@ -258,25 +258,3 @@ Load Balancer의 역할을 함 (※ 실제 흔히 말하는 로드 밸런서의 
 ![image](https://user-images.githubusercontent.com/93081720/198083922-5dc140f3-2c87-4798-a478-4d65e1fe6fe7.png)
 
 <br>
-
-## 4. Kubernetes 구축하기
-
-실제 서버를 여러 대 사용해서 클러스터를 구축하는 방법
-
-- 물리적 머신이나 가상 머신을 필요한 만큼 준비(마스터 노드를 포함)
-- 마스터 노드 역할을 할 머신에 k8s, etcd, CNI를 설치함(kubeadm 사용)
-- 마스터 노드에서 kubeadm init으로 클러스터 초기화
-- 워커 노드에서 kubeadm join으로 마스터와 연결
-
-### Kubeadm
-
-쿠버네티스에서 제공하는 기본적인 도구로 쿠버네티스 클러스터 구축을 위한 다양한 기능을 제공한다.
-
-※ 부트스트랩핑(bootstrapping) : 부팅의 현재 진행형(부팅이라고 이해하는 게 더 빠름)
-
-- `kubeadm init` : 쿠버네티스 컨트롤 플레인 노드를 부트스트랩한다.
-- `kubeadm join` : 쿠버네티스 워커 노드를 부트스트랩하고 클러스터에 연결시킨다.
-
-<img src="https://user-images.githubusercontent.com/93081720/221210314-9f2c21c4-9a2f-421b-8bf2-217fcf5a1bc7.png" referrerpolicy="no-referrer" alt="image" height="200px">
-
-<br>
