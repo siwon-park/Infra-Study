@@ -1,4 +1,4 @@
-# 05_Kubernetes_Objects
+# 05_Kubernetes_Objects_Practice
 
 쿠버네티스 오브젝트들
 
