@@ -99,6 +99,14 @@ $ sudo kubectl apply -f configs/
 
 
 
+## 5. 구성 파일 작성 및 이해
+
+`yml`파일에 작성하는 각 항목에 대해 정리
+
+
+
+
+
 TEMP
 
 ```yml
