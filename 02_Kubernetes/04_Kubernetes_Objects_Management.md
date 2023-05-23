@@ -145,7 +145,7 @@ $ sudo kubectl apply -f configs/
 
 `yml`파일에 작성하는 각 항목에 대해 정리
 
-
+![image](https://github.com/siwon-park/Problem_Solving/assets/93081720/9aad51b5-8544-4793-a414-92300227d9fb)
 
 
 
