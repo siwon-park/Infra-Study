@@ -143,37 +143,17 @@ $ sudo kubectl apply -f configs/
 
 ## 5. 구성 파일 작성 및 이해
 
-`yml`파일에 작성하는 각 항목에 대해 정리
+다음은 쿠버네티스 구성 `yml`파일에 대한 예시이다.
 
 ![image](https://github.com/siwon-park/Problem_Solving/assets/93081720/9aad51b5-8544-4793-a414-92300227d9fb)
 
+#### apiVersion (Kubernetes API)
 
+생성, 수정, 삭제든 쿠버네티스 오브젝트를 동작시키려면 `Kubernetes API`를 이용해야 한다.
 
-TEMP
+우리가 사용하는 `kubectl`도 실제로는 kubernetes API를 호출하여 동작하는 것이다.
 
-```yml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: be42-deploy
-spec:
-  selector:
-    matchLabels:
-      app: be42
-  template:
-    metadata:
-      labels:
-        app: be42
-    spec:
-      dnsPolicy: Default
-      dnsConfig:
-        nameservers:
-          - 8.8.8.8
-      containers:
-        - name: be42
-          image: 15.164.102.222:1588/return/be
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
-```
+따라서 yml 구성 파일을 작성할 때도 호출할 kubernetes API를 지정해줘야 한다.
 
+- 각 오브젝트별로 호출할 수 있는 api 버전이 [공식문서](https://kubernetes.io/docs/reference/kubernetes-api/)에 잘 정리되어 있다.
+  - 따라서 자기 마음대로 버전관리 한답시고`v1`, `v2`를 붙일 수 없다. 물론 우연히 얻어 걸려서 해당 오브젝트에 해당하는 apiVersion이 있다면 괜찮겠지만, 그게 아니라면 에러가 난다.
