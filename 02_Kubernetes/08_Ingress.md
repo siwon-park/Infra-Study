@@ -46,3 +46,24 @@
 ![image](https://github.com/siwon-park/Problem_Solving/assets/93081720/45b295d9-5c27-4d30-9f66-b5250c18b0ef)
 
 <br>
+
+## 3. 인그레스 컨트롤러 (Ingress Controller)
+
+Ingress를 선언하기 위해 yml파일을 작성하고 적용시켜도 아무 일이 발생하지 않는다.
+
+Ingress라는 오브젝트 리소스가 동작하기 위해서는 `인그레스 컨트롤러(Ingress Controller)`가 필요하다.
+
+인그레스 컨트롤러는 특수한 서버이며, 인그레스 컨트롤러가 인그레스 규칙을 로드하여 사용하는 것이고 실제로 외부의 요청을 받아들이는 것은 인그레스 컨트롤러이다.
+
+`kube-controller-manager`와 함께 동작하는 다른 타입의 컨트롤러와는 다르게, 인그레스 컨트롤러는 클러스터와 함께 자동적으로 실행되지 않는다.
+
+따라서 정상적으로 인그레스에 정의한 규칙들을 적용하기 위해서는 본인의 인프라(클러스터)에 맞는 적합한 인그레스 컨트롤러를 선택해서 적용해야 한다.
+
+### 종류
+
+인그레스 컨트롤러의 종류는 다양하며, 쿠버네티스에서 공식적으로 관리되는 것이 아니라 제 3자에 의해 관리되는 서드 파티 라이브러리의 개념이다.
+
+NGINX Ingress Controller, ngrok Ingress Controller, Istio Ingress Controller, Kong Ingress Controller, HAProxy Ingress Controller, Traefik Ingress Controller 등 다양한 인그레스 컨트롤러가 존재한다.
+
+자세한 내용은 [쿠버네티스 공식 문서](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)에서 확인할 수 있다.
+
