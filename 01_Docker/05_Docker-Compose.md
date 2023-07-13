@@ -27,13 +27,73 @@
 
 <br>
 
+### 2. 버전
+
+#### docker compose v1
+
+`docker-compose`로 명명하며 반드시 `하이픈(-)`을 같이 붙여줘야 한다.
+
+#### docker compose v2
+
+`docker compose`로 `하이픈(-)`이 빠진 명령어로도 동작이 가능하다.
+
+`docker-cli`에 통합되어 있기 때문에 기본적으로 docker를 설치하고 나면 docker help 입력 시 management command에 `compose*`로 표시되어 있는 것을 확인할 수 있으며 `docker compose version` 명령어로 버전을 확인할 수도 있다.
+
+`docker compose version`이 가능한 이유가 기본 Docker 명령어 옵션 순서가 `Docker [OPTIONS] COMMAND`인데, command로 compose가 들어가 있기 때문이다.
+
+<br>
+
+### 3. 설치
+
+※ Linux는 docker-compose를 따로 설치해줘야한다. (Mac OS나 Windows는 도커 설치 시 자동으로 설치된다.)
+
+다음은 Jenkins 컨테이너 내에 docker-compose를 설치하는 예시이다.
+
+#### Jenkins 컨테이너 접속
+
+컨테이너 이름: jenkins
+
+```bash
+sudo docker exec -it jenkins /bin/bash
+```
+
+#### docker-compose 다운로드
+
+Github에서 최신 버전의 docker-compose 바이너리 파일을 다운받는다.
+
+```bash
+curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+```
+
+#### 실행 권한 부여
+
+다운로드한 파일에 실행 권한을 부여한다.
+
+```bash
+chmod +x /usr/local/bin/docker-compose
+```
+
+#### 버전 확인
+
+제대로 설치되었는지 버전을 확인한다.
+
+```bash
+docker-compose version
+```
+
+※ `docker-compose` 버전을 확인해보면 `V2`인 것을 확인할 수 있지만, `docker compose XXX`로는 명령어를 날릴 수 없다.
+
+그 이유는 컨테이너 내부에서 `docker help`를 처보면 알겠지만, compose가 명령어로서 보이지 않는 것을 확인할 수 있다. 따라서 설치한 이름 그대로 `docker-compose`로 사용하는 것이다.
+
+<br>
+
 ## 01_Getting Started
 
 >  docker-compose 파일 생성
 
 `docker-compose.yml` 또는 `docker-compose.yaml` 파일을 생성
 
-※ Linux는 docker-compose를 따로 설치해줘야한다. (Mac OS나 Windows는 도커 설치 시 자동으로 설치된다.)
+
 
 ![image](https://user-images.githubusercontent.com/93081720/193403937-dfb16a44-d100-4696-9a02-93a882de38dd.png)
 
