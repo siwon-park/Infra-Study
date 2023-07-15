@@ -1,14 +1,14 @@
 # 01_Jenkins CI/CD 환경 구성 - DinD
 
-### 사용 기술 스택
+> Docker in Docker 방식을 사용한 Jenkins CI/CD 환경 구성
 
-> Jenkins
+## 1. 기술 스택
 
 |                           Jenkins                            |
 | :----------------------------------------------------------: |
 | ![image](https://user-images.githubusercontent.com/93081720/191645439-6e86c92c-3fb9-490c-a23c-fa7fb70bf746.png) |
 
-Docker-Compose를 이용하여 젠킨스 이미지를 설치하고 빌드 환경을 구성하여, 작업 결과를 push했을 때, webhook을 통해 자동으로 빌드를 시작하게끔 설정까지 진행하고자함
+
 
 |                           Gitbash                            |                            GitLab                            |                          MatterMost                          |                           WebHook                            |
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
@@ -16,9 +16,9 @@ Docker-Compose를 이용하여 젠킨스 이미지를 설치하고 빌드 환경
 
 <br>
 
-## 환경 구성 과정
+## 2. 환경 구성
 
-### 1. Docker 설치
+### 1) Docker 설치
 
 > EC2에 도커 설치하기. 자세한 것은 공식문서를 참조하는 것을 권장함
 
@@ -39,7 +39,7 @@ sudo apt-get install -y ca-certificates \
 
 
 
-#### gpg키 설치
+#### Docker official gpg key 설치
 
 도커를 설치하기 위해 gpg Key를 다운받아야 함. 이는 리눅스 패키지 툴이 프로그램 패키지가 유효한지 확인하기 위해 설치 전에 gpg 키를 통해 검증하는 과정을 거치기 때문이라고 함
 
@@ -65,9 +65,17 @@ sudo apt install docker-ce docker-ce-cli containerd.io docker-compose
 
 <br>
 
-### 2. Jenkins 설치
+### 2) Jenkins 설치
 
-#### docker-compose.yml
+Docker in Docker(DinD) 방식으로 Jenkins를 설치하는 방법은 크게 3가지가 있다.
+
+DinD 방식은 보안상 권장하는 방식은 아니나, 그렇다고 해서 Docker out of Docker(DooD) 방식 또한 완벽하게 안전한 것은 아님을 유의.
+
+#### [privileged 모드 설치]
+
+★☆ `privileged: true`로 설정하여 젠킨스가 호스트 머신의 도커 데몬의 권한을 사용할 수 있게끔 함.
+
+##### docker-compose.yml
 
 ```bash
 sudo vim docker-compose.yml
@@ -91,21 +99,110 @@ services:
 
 - ecs를 누르고 :wq를 통해 write & quit
 
-★☆ `privileged: true`로 설정 → **Docker in Docker(DinD)** 방식으로 배포할 예정
-
-- DinD 방식은 보안상 권장하는 방식은 아니나, 그렇다고 해서 Docker out of Docker(DooD) 방식 또한 완벽하게 안전한 것은 아님
-
-#### 컨테이너 생성
+##### 컨테이너 생성
 
 ```bash
 sudo docker-compose up -d
 ```
 
+##### Jenkins 컨테이너 내부 도커 설치
+
+privileged 모드라고 하더라도 `docker-cli` 환경이 jenkins 컨테이너 내부에 존재하지 않기 때문에 설치가 필요함
+
+- Jenkins 컨테이너 내부 접속
+
+```bash
+sudo docker exec -it jenkins /bin/bash
+```
+
+- Docker 설치(EC2에 설치했던 것과 과정이 같음)
+
+```bash
+apt-get update
+
+apt-get install ca-certificates curl gnupg lsb-release
+
+mkdir -p /etc/apt/keyrings
+
+# jenkins의 os가 debian이기 때문에 gpg키가 ubuntu에서 debian으로 바뀐 것에만 유의!
+curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+$(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+apt-get update
+
+apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin docker-compose
+```
+
 <br>
 
-#### Jenkins plugin 설치
+#### [내부에 Docker 설치]
 
-도메인:9090 포트로 접속하면 아래와 같이 어드민 비밀번호를 입력하고 
+컨테이너 내부에 Docker만 설치한다. privileged 옵션은 건들지 않는다. 설치 과정은 위의 Jenkins 내부에 Docker를 설치하는 과정과 같다.
+
+<br>
+
+#### [Jenkins 커스텀 이미지 생성]
+
+Jenkins Officail 이미지를 토대로 Docker 커스텀 이미지를 만들어 Docker가 설치된 환경으로 이미지를 빌드한다.
+
+- Dockerfile 생성
+
+```dockerfile
+FROM jenkins:lts
+
+USER root
+
+RUN apt-get update \
+ && apt-get -y install lsb-release \
+ && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg \
+ && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null \
+ && apt-get update \
+ && apt-get -y install docker-ce docker-ce-cli containerd.io
+ 
+RUN usermod -u {{호스트 사용자 아이디}} jenkins && \
+    groupmod -g {{호스트 도커 그룹 아이디}} docker && \
+    usermod -aG docker jenkins
+
+USER jenkins
+```
+
+- 호스트 사용자 아이디 확인 
+
+```bash
+sudo cat /etc/passwd
+```
+
+- 호스트 도커 그룹 아이디 확인
+
+```bash
+sudo cat /etc/group
+```
+
+- 이미지 빌드
+
+```bash
+sudo docker build -t [이미지명:태그명] .
+```
+
+- Jenkins 컨테이너 실행
+
+```bash
+sudo docker run -d --name jenkins -v /var/run/docker.sock:/var/run/docker.sock -v /jenkins:/var/jenkins_home -p 9090:8080 [이미지명:태그명]
+```
+
+- Jenkins 컨테이너 내 Docker 설치 여부 확인
+
+```bash
+sudo docker exec jenkins docker ps
+```
+
+<br>
+
+### 3) Jenkins plugin 설치
+
+`도메인:9090 포트`로 접속하면 아래와 같이 어드민 비밀번호를 입력하고 
 
 ![image](https://user-images.githubusercontent.com/93081720/191662258-7cf44cfa-76ca-42bf-b5bf-a15c2e08e2f8.png)
 
@@ -159,15 +256,17 @@ gitlab, docker, SSH관련 플러그인을 설치해준다
 
 <br>
 
-### 3. Jenkins 프로젝트 생성
+## 3. Jenkins 프로젝트 생성 - FreeStyle
 
-젠킨스 메인페이지에서 `새로운 item` 을 클릭하여 새로운 페이지를 생성합니다
+>  이번 Jenkins 프로젝트는 FreeStyle로 프로젝트를 생성합니다. pipeline으로도 프로젝트를 생성하여 관리할 수도 있습니다.
+
+젠킨스 메인페이지에서 `새로운 item` 을 클릭하여 새로운 페이지를 생성합니다.
+
+#### 프로젝트 생성
 
 ![image](https://user-images.githubusercontent.com/93081720/191664980-95687517-29a7-4619-aeb5-336f95447193.png)
 
 <br>
-
->  이번 Jenkins 프로젝트는 freestyle project로 생성합니다. pipeline으로도 프로젝트를 생성하여 프로젝트를 관리할 수도 있습니다.
 
 프로젝트 명을 정한 뒤에  freestyle project로 생성합니다.
 
@@ -278,65 +377,15 @@ Secret token에는 아까 위에서 젠킨스 프로젝트를 생성할 때 저�
 
 <br>
 
-### 4. Jenkins에서 Docker 이미지 빌드하기
+## 4. Jenkins에서 Docker 이미지 빌드하기
 
-젠킨스에서 도커 이미지를 빌드하고, 컨테이너를 실행하기 위해서는 Jenkins 컨테이너 안에 도커를 설치해야합니다. 그러나 컨테이너 안에 컨테이너를 실행하는 방법(DID; Docker in Docker)은 도커에서 권장하는 방법이 아니지만, 일단 해당 방법으로 진행합니다.
-
-#### Jenkins 컨테이너 안에 도커 설치하기
-
-EC2 환경에서 사전에 도커를 설치했던 것과 마찬가지로 도커 설치를 진행한다. 차이가 있다면, jenkins 컨테이너 환경에서 설치하기 위해서 jenkins bash shell에 접근해야하는 것과 jenkins의 os가 debian이므로 gpg키를 설치할 때 debian으로 설정해주면 된다.
-
-- jenkins bash shell 접근하기
-
-```bash
-sudo docker exec -it jenkins bash
-```
-
-- 사전 패키지 설치
-
-```bash
-sudo apt update
-
-sudo apt-get install -y ca-certificates \
-    curl \
-    software-properties-common \
-    apt-transport-https \
-    gnupg \
-    lsb-release
-```
-
-- gpg 키 설치
-
-> ubuntu를 debian으로 바꿔서 gpg키를 설치해야한다
-
-```bash
-mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-    $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-```
-
-- 도커 이미지 설치
-
-```bash
-sudo apt update
-
-sudo apt install docker-ce docker-ce-cli containerd.io docker-compose
-```
-
-<br>
-
-### 5. jenkins 도커 이미지 빌드를 하기
-
-#### Dockerfile 작성하기
+### 1) Dockerfile 작성하기
 
 도커 파일 작성은 Backend, Frontend, Socket 항목에 작성해놓았으므로 해당 항목을 참조하면 됩니다.
 
 <br>
 
-#### jenkins 빌드 구성
+### 2) Jenkins 빌드 구성
 
 빌드 단계에 들어가서 `Add build step`을 누르고 `Execute Shell`을 선택하여 아래와 같이 입력합니다.
 
@@ -375,7 +424,7 @@ ls /var/jenkins_home/images_tar
 
 <br>
 
-### 6. Jenkins에서 빌드한 이미지를 자동으로 컨테이너화하기
+### 3) Jenkins에서 빌드한 이미지를 자동으로 컨테이너화하기
 
 젠킨스에서 빌드한 .tar 파일을 자동으로 컨테이너화하기 위해서는 SSH연결 설정을 해야한다
 
@@ -500,9 +549,9 @@ Nginx에 관한 설정은 각 프로젝트의 nginx나 nginx와 ssl 적용 항�
 
 <br>
 
-### (추가) MM과 연동해보기
+## 5. (추가) MM과 연동해보기
 
-#### 방법1. 직접 작성
+### 1) 방법1. 직접 작성
 
 완벽하지는 않지만 MM에 빌드가 성공했을 경우 메세지를 보낼 수도 있습니다.
 
@@ -559,7 +608,7 @@ eval $REQUETE
 
 <br>
 
-#### 방법2. 플러그인 이용 - pipeline 스크립트 작성
+### 2) 방법2. 플러그인 이용 - pipeline 스크립트 작성
 
 pipeline 스크립트로 jenkins 빌드 과정을 구성했다면 MatterMost Notification Application을 설치하고 다음과 같이 사용할 수 있다.
 
