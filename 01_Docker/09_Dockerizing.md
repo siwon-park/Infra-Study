@@ -4,9 +4,9 @@
 
 ## 1. FrontEnd Dockerizing
 
-### 올바른 배포 방법
+### 1) 올바른 배포 방법
 
-> npm run build를 통해 빌드한 결과물을 nginx 위에서 동작하게 해야 함
+> npm run build를 통해 빌드한 결과물을 nginx 위에서 혹은 serve로 동작하게 해야 함
 
 `npm run build`를 하게 되면 `dist`나 `build`폴더가 생성되는데, 해당 폴더 안에 있는 `index.html`을 배포해야 한다.
 
@@ -68,9 +68,31 @@ EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
+`serve`를 사용하여 배포하는 방법도 있다. 단, 이미지 빌드 시에 serve를 설치해줘야 한다.
+
+```dockerfile
+FROM node:16.15.0 AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN ["npm", "install"]
+
+COPY . .
+
+RUN ["npm", "run", "build"]
+
+RUN ["npm", "install", "-g", "serve"]  # serve 설치
+
+EXPOSE 3000
+
+CMD ["serve", "-s", "build"]
+```
+
 <br>
 
-### 올바르지 않은 배포 방법
+### 2) 올바르지 않은 배포 방법
 
 > CMD ["npm", "start"]를 통한 프로젝트 실행은 개발자 모드로 실행되기 때문에 프로젝트 올바르지 않음
 
